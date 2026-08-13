@@ -1,0 +1,23 @@
+{
+  "name": "customjudge",
+  "version": "1.0.0",
+  "description": "Judge0 CE-compatible judging service with compile-once/execute-many for C++",
+  "main": "src/api/server.js",
+  "scripts": {
+    "start:api": "node src/api/server.js",
+    "start:compile": "node src/workers/compileWorker.js",
+    "start:execute": "node src/workers/executeWorker.js",
+    "migrate": "node src/db/migrate.js",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bullmq": "^5.12.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "pg": "^8.12.0"
+  }
+}

@@ -1,0 +1,18 @@
+[Unit]
+Description=customJudge compile worker (host-native, invokes isolate)
+After=network-online.target isolate.service
+Requires=isolate.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/customjudge
+EnvironmentFile=/opt/customjudge/.env
+ExecStart=/usr/bin/node src/workers/compileWorker.js
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
