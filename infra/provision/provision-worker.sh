@@ -30,6 +30,7 @@ log "Installing build dependencies..."
 apt-get update -qq
 apt-get install -y --no-install-recommends \
   git build-essential pkg-config libcap-dev libsystemd-dev asciidoc-base \
+  libseccomp-dev libxml2-utils docbook-xml docbook-xsl xsltproc \
   g++ curl ca-certificates
 
 log "Building isolate from upstream ($ISOLATE_REF)..."
@@ -41,9 +42,45 @@ make install
 popd >/dev/null
 rm -rf "$BUILD_DIR"
 
+log "Ensuring isolate user + subordinate ID mappings..."
+if ! id -u isolate >/dev/null 2>&1; then
+  useradd --system --no-create-home --shell /usr/sbin/nologin isolate
+fi
+
+ensure_subid_map() {
+  local file="$1"
+  local user="$2"
+  local span=65536
+  local start
+
+  if grep -qE "^${user}:" "$file"; then
+    return 0
+  fi
+
+  start="$(awk -F: '
+    BEGIN { max = 99999 }
+    $2 ~ /^[0-9]+$/ && $3 ~ /^[0-9]+$/ {
+      end = $2 + $3 - 1
+      if (end > max) max = end
+    }
+    END { print max + 1 }
+  ' "$file")"
+
+  echo "${user}:${start}:${span}" >> "$file"
+}
+
+ensure_subid_map /etc/subuid isolate
+ensure_subid_map /etc/subgid isolate
+
 log "Enabling isolate.service (delegated cgroup subtree)..."
 systemctl daemon-reload
-systemctl enable --now isolate.service || fail "isolate.service failed to start"
+if ! systemctl enable --now isolate.service; then
+  log "isolate.service status:"
+  systemctl status isolate.service --no-pager -l || true
+  log "isolate.service journal (last 120 lines):"
+  journalctl -u isolate.service -b --no-pager -n 120 || true
+  fail "isolate.service failed to start"
+fi
 
 log "Creating data directories at $DATA_ROOT..."
 mkdir -p "$DATA_ROOT"/{problems,binaries,tmp}
