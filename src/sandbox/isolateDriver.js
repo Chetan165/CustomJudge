@@ -73,13 +73,15 @@ async function cleanup(boxId) {
 
 function buildLimitArgs(limits) {
   const args = [];
-  if (limits.cpu_time_limit != null) args.push(`--time=${limits.cpu_time_limit}`);
+  if (limits.cpu_time_limit != null)
+    args.push(`--time=${limits.cpu_time_limit}`);
   if (limits.wall_time_limit != null)
     args.push(`--wall-time=${limits.wall_time_limit}`);
   if (limits.extra_time != null) args.push(`--extra-time=${limits.extra_time}`);
   if (limits.memory_limit != null) args.push(`--cg-mem=${limits.memory_limit}`);
   if (limits.stack_limit != null) args.push(`--stack=${limits.stack_limit}`);
-  if (limits.max_file_size != null) args.push(`--fsize=${limits.max_file_size}`);
+  if (limits.max_file_size != null)
+    args.push(`--fsize=${limits.max_file_size}`);
   if (limits.max_processes != null)
     args.push(`--processes=${limits.max_processes}`);
   if (limits.enable_network) args.push("--share-net");
@@ -109,8 +111,7 @@ async function execute({
       const args = ["--cg", `--box-id=${boxId}`, `--meta=${metaPath}`];
 
       for (const m of mounts) {
-        const opts = m.rw ? "rw" : "ro";
-        args.push(`--dir=${m.inside}=${m.outside}:${opts}`);
+        args.push(`--dir=${m.inside}=${m.outside}${m.rw ? ":rw" : ""}`);
       }
 
       args.push("--stdout=__stdout", "--stderr=__stderr");
