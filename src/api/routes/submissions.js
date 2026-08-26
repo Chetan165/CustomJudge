@@ -47,6 +47,7 @@ router.post("/submissions", async (req, res) => {
 
 // POST /submissions/batch
 router.post("/submissions/batch", async (req, res) => {
+  console.log("Batch submission request body:", req.body);
   const list = req.body?.submissions;
   if (!Array.isArray(list) || !list.length) {
     return res
