@@ -81,18 +81,29 @@ async function compile({ compileKey, sourceCode, languageId, limits }) {
     const res = await sandbox.executeWithArtifact({
       command,
       limits: {
-        // Compile gets the full wall budget; execution runs get a tighter one.
         wall_time_limit: limits.wall_time_limit ?? 15,
         cpu_time_limit: limits.wall_time_limit ?? 15,
         memory_limit: Math.max(Number(limits.memory_limit ?? 128000), 512000),
         max_processes: 64,
         max_file_size: 131072,
       },
+
+      mounts: [
+        {
+          inside: config.compile.JavaHome,
+          outside: config.compile.JavaHome,
+          rw: false,
+        },
+      ],
+      env: {
+        JAVA_HOME: config.compile.JavaHome,
+        PATH: `${config.compile.JavaHome}/bin:/usr/local/bin:/usr/bin:/bin`,
+      },
+
       inputFiles: [{ name: SOURCE_NAME, content: sourceCode }],
       artifactName: ARTIFACT_NAME,
       artifactDest: dest,
     });
-
     const compileOutput = [res.stdout, res.stderr]
       .filter(Boolean)
       .join("\n")

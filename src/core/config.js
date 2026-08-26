@@ -62,11 +62,17 @@ const config = {
   compile: {
     binaryCacheMaxBytes: num(process.env.BINARY_CACHE_MAX_BYTES, 2 * 1024 ** 3),
     compiler: process.env.CXX_COMPILER || "/usr/bin/g++",
-    JavaCompiler: process.env.JavaCompiler || "/usr/bin/javac",
-    JavaExecutable: process.env.JavaExecutable || "/usr/bin/java",
+    JavaHome: process.env.JavaHome || "/usr/lib/jvm/java-11-openjdk-amd64",
+    JavaCompiler:
+      `${process.env.JavaHome}/bin/javac` ||
+      "/usr/lib/jvm/java-11-openjdk-amd64/usr/bin/javac",
+    JavaExecutable:
+      `${process.env.JavaHome}/bin/java` ||
+      "/usr/lib/jvm/java-11-openjdk-amd64/usr/bin/java",
     JavaFlags: process.env.JAVA_FLAGS || "-encoding=UTF-8",
     JavaJar:
-      process.env.JavaJar || "/usr/lib/jvm/java-11-openjdk-amd64/bin/jar",
+      `${process.env.JavaHome}/bin/jar` ||
+      "/usr/lib/jvm/java-11-openjdk-amd64/bin/jar",
     flags: (process.env.CXX_FLAGS || "-std=c++17 -O2 -w -lm -static -s")
       .split(/\s+/)
       .filter(Boolean),
