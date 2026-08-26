@@ -56,19 +56,18 @@ router.post("/submissions/batch", async (req, res) => {
   // A batch is proxied only if no entry is C++; mixed batches aren't split
   // because Judge0 requires token order to mirror input order.
   if (!list.some((s) => isSupported(s?.language_id)))
-    return proxy.forward(req, res);
+    return res.status(422).json({ error: "No supported languages found" });
   if (!list.every((s) => isSupported(s?.language_id))) {
-    return res
-      .status(422)
-      .json({
-        error: "mixed-language batches are not supported; split by language",
-      });
+    return res.status(422).json({
+      error: "mixed-language batches are not supported; split by language",
+    });
   }
 
   try {
     const b64 = isBase64(req);
     const decoded = list.map((s) => decodeSubmissionInput(s, b64));
     const results = await submissionService.createBatch(decoded);
+    console.log("Batch submission results:", results);
     return res.status(201).json(results);
   } catch (err) {
     return handleError(res, err);
