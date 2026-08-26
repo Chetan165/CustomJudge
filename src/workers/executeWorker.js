@@ -127,7 +127,18 @@ async function processExecute(job) {
       mounts: [
         { inside: TC_MOUNT, outside: stdin.mountDir, rw: false },
         { inside: BIN_MOUNT, outside: path.dirname(binaryPath), rw: false },
+
+        // Java JDK — read-only
+        {
+          inside: config.compile.JavaHome,
+          outside: config.compile.JavaHome,
+          rw: false,
+        },
       ],
+      env: {
+        JAVA_HOME: config.compile.JavaHome,
+        PATH: `${config.compile.JavaHome}/bin:/usr/local/bin:/usr/bin:/bin`,
+      },
       stdinPath: stdin.sandboxPath,
     });
   } finally {
