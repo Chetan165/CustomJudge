@@ -160,6 +160,8 @@ async function execute({
 async function executeWithArtifact({
   command,
   limits = {},
+  mounts = [],
+  env = {},
   inputFiles = [],
   artifactName,
   artifactDest,
@@ -171,6 +173,7 @@ async function executeWithArtifact({
     const metaPath = path.join(boxRoot, "meta.txt");
 
     try {
+      // Write submitted source/input files into the writable isolate box.
       for (const f of inputFiles) {
         await fsp.writeFile(path.join(boxDir, f.name), f.content);
       }
@@ -181,10 +184,24 @@ async function executeWithArtifact({
         `--meta=${metaPath}`,
         "--stdout=__stdout",
         "--stderr=__stderr",
+
+        // Optional host-directory mounts.
+        // Default is [] so existing C++ behavior is unchanged.
+        ...mounts.map(
+          (m) => `--dir=${m.inside}=${m.outside}${m.rw ? ":rw" : ""}`,
+        ),
+
+        // Java/JVM needs multiple threads.
         "--processes=64",
-        `--env=PATH=/usr/local/bin:/usr/bin:/bin`,
+
+        // Existing sandbox environment.
         `--env=HOME=/box`,
+
+        // Optional additional environment variables.
+        ...Object.entries(env).map(([key, value]) => `--env=${key}=${value}`),
+
         ...buildLimitArgs(limits),
+
         "--run",
         "--",
         ...command,
@@ -197,15 +214,20 @@ async function executeWithArtifact({
         fsp.readFile(path.join(boxDir, "__stdout"), "utf8").catch(() => ""),
         fsp.readFile(path.join(boxDir, "__stderr"), "utf8").catch(() => ""),
       ]);
+
       const meta = parseMeta(metaRaw);
 
       let artifact = null;
+
       if (artifactName) {
         const src = path.join(boxDir, artifactName);
+
         try {
           artifact = await fsp.readFile(src);
+
           if (artifactDest) {
             const { writeFileAtomic } = require("../core/atomicFs");
+
             await writeFileAtomic(artifactDest, artifact, 0o755);
           }
         } catch {
