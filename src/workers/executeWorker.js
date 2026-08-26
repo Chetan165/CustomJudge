@@ -28,7 +28,7 @@ const LanguageCommands = {
     );
     const command = [
       `${config.compile.JavaExecutable}`,
-      "-Xss64m",
+      "-Xss1m",
       `-Xmx${heapMb}m`,
       "-jar",
       `${BIN_MOUNT}/${path.basename(binaryPath)}`,
