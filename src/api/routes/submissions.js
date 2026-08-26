@@ -3,7 +3,7 @@ const router = express.Router();
 
 const config = require("../../core/config");
 const { ID } = require("../../core/statuses");
-const { isCpp } = require("../../core/languages");
+const { isSupported } = require("../../core/languages");
 const { decodeSubmissionInput } = require("../../core/encoding");
 const submissionRepo = require("../../db/submissionRepo");
 const submissionService = require("../submissionService");
@@ -23,7 +23,7 @@ function handleError(res, err) {
 
 // POST /submissions
 router.post("/submissions", async (req, res) => {
-  if (!isCpp(req.body?.language_id)) return proxy.forward(req, res);
+  if (!isSupported(req.body?.language_id)) return proxy.forward(req, res);
 
   try {
     const body = decodeSubmissionInput(req.body, isBase64(req));
@@ -49,15 +49,20 @@ router.post("/submissions", async (req, res) => {
 router.post("/submissions/batch", async (req, res) => {
   const list = req.body?.submissions;
   if (!Array.isArray(list) || !list.length) {
-    return res.status(400).json({ error: "submissions must be a non-empty array" });
+    return res
+      .status(400)
+      .json({ error: "submissions must be a non-empty array" });
   }
   // A batch is proxied only if no entry is C++; mixed batches aren't split
   // because Judge0 requires token order to mirror input order.
-  if (!list.some((s) => isCpp(s?.language_id))) return proxy.forward(req, res);
-  if (!list.every((s) => isCpp(s?.language_id))) {
+  if (!list.some((s) => isSupported(s?.language_id)))
+    return proxy.forward(req, res);
+  if (!list.every((s) => isSupported(s?.language_id))) {
     return res
       .status(422)
-      .json({ error: "mixed-language batches are not supported; split by language" });
+      .json({
+        error: "mixed-language batches are not supported; split by language",
+      });
   }
 
   try {
@@ -87,15 +92,14 @@ router.get("/submissions/batch", async (req, res) => {
     .split(",")
     .map((t) => t.trim())
     .filter(Boolean);
-  if (!tokens.length) return res.status(400).json({ error: "tokens is required" });
+  if (!tokens.length)
+    return res.status(400).json({ error: "tokens is required" });
 
   try {
     const rows = await submissionRepo.findByTokens(tokens);
     const fields = parseFields(req.query.fields);
     const b64 = isBase64(req);
-    const missing = rows
-      .map((r, i) => (r ? null : tokens[i]))
-      .filter(Boolean);
+    const missing = rows.map((r, i) => (r ? null : tokens[i])).filter(Boolean);
 
     if (missing.length && config.judge0Fallback.url) {
       return proxy.forward(req, res);

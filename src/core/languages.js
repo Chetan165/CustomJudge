@@ -1,7 +1,7 @@
 const { LANGUAGES } = require("./judge0Languages");
 
 // v1 optimizes C++ only; every other language_id proxies to real Judge0.
-const CPP_LANGUAGE_IDS = new Set([54, 76, 105, 52, 53]);
+const Supported_languages = new Set([62, 54, 76, 105, 52, 53]);
 
 // Per-language limits, mirroring the platform's Judge0Config/config.js.
 const DEFAULT_LIMITS = {
@@ -16,10 +16,11 @@ const DEFAULT_LIMITS = {
 
 const LANGUAGE_LIMIT_OVERRIDES = {
   54: { cpu_time_limit: 2, wall_time_limit: 8 },
+  62: { cpu_time_limit: 3, wall_time_limit: 10 , memory_limit: 512000, stack_limit: 128000 , max_processes: 64, max_file_size: 131072 },
 };
 
-function isCpp(languageId) {
-  return CPP_LANGUAGE_IDS.has(Number(languageId));
+function isSupported(languageId) {
+  return Supported_languages.has(Number(languageId));
 }
 
 function getLanguage(id) {
@@ -39,9 +40,9 @@ function getLimits(languageId, overrides = {}) {
 
 module.exports = {
   LANGUAGES,
-  CPP_LANGUAGE_IDS,
+  Supported_languages,
   DEFAULT_LIMITS,
-  isCpp,
+  isSupported,
   getLanguage,
   getLimits,
 };

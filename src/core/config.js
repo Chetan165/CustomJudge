@@ -62,6 +62,9 @@ const config = {
   compile: {
     binaryCacheMaxBytes: num(process.env.BINARY_CACHE_MAX_BYTES, 2 * 1024 ** 3),
     compiler: process.env.CXX_COMPILER || "/usr/bin/g++",
+    JavaCompiler: process.env.JAVA_COMPILER || "/usr/bin/javac",
+    JavaExecutable: process.env.JAVA_EXECUTABLE || "/usr/bin/java",
+    JavaFlags: process.env.JAVA_FLAGS || "-encoding=UTF-8",
     flags: (process.env.CXX_FLAGS || "-std=c++17 -O2 -w -lm -static -s")
       .split(/\s+/)
       .filter(Boolean),

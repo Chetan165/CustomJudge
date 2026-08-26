@@ -1,17 +1,29 @@
 const { Worker } = require("bullmq");
 const { connection } = require("../queue/connection");
-const { COMPILE_QUEUE, QUEUE_PREFIX, getExecuteQueue } = require("../queue/queues");
+const {
+  COMPILE_QUEUE,
+  QUEUE_PREFIX,
+  getExecuteQueue,
+} = require("../queue/queues");
 const config = require("../core/config");
 const { ID } = require("../core/statuses");
 const { compileCacheKey } = require("../core/hash");
 const submissionRepo = require("../db/submissionRepo");
 const testcaseStore = require("../testcases/testcaseStore");
-const compiler = require("../compile/compiler");
+const compilerCpp = require("../compile/compiler");
+const compilerJava = require("../compile/compiler-java");
 const { deliver } = require("../callbacks/deliver");
 const { publishFinished } = require("../api/waitRegistry");
 const { createLogger } = require("../core/logger");
 
 const log = createLogger("compile-worker");
+
+const DecideCompiler = (languageId) => {
+  if (languageId == 62) {
+    return compilerJava;
+  }
+  return compilerCpp;
+};
 
 async function emitCompilationError(groupId, compileOutput) {
   const rows = await submissionRepo.finalizeGroup(groupId, {
@@ -28,6 +40,7 @@ async function emitCompilationError(groupId, compileOutput) {
 
 async function processCompile(job) {
   const { submissionGroup, languageId, problemId, testcaseVersion } = job.data;
+  const compiler = DecideCompiler(languageId);
 
   const rows = await submissionRepo.findGroup(submissionGroup);
   if (!rows.length) {
@@ -38,7 +51,11 @@ async function processCompile(job) {
   const first = rows[0];
   await submissionRepo.setGroupStatus(submissionGroup, ID.PROCESSING);
 
-  const key = compileCacheKey(first.source_code, languageId, config.compile.flags);
+  const key = compileCacheKey(
+    first.source_code,
+    languageId,
+    config.compile.flags,
+  );
   await submissionRepo.setCompileKey(submissionGroup, key);
 
   const limits = {
@@ -108,7 +125,9 @@ worker.on("failed", async (job, err) => {
   }
 });
 
-worker.on("completed", (job) => log.debug("compile job done", { jobId: job.id }));
+worker.on("completed", (job) =>
+  log.debug("compile job done", { jobId: job.id }),
+);
 
 log.info("compile worker started", {
   concurrency: config.worker.compileConcurrency,

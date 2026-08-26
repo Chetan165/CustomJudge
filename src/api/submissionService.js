@@ -1,7 +1,7 @@
 const { randomUUID } = require("crypto");
 const config = require("../core/config");
 const { ID } = require("../core/statuses");
-const { isCpp, getLimits, getLanguage } = require("../core/languages");
+const { isSupported, getLimits, getLanguage } = require("../core/languages");
 const submissionRepo = require("../db/submissionRepo");
 const testcaseStore = require("../testcases/testcaseStore");
 const { getCompileQueue } = require("../queue/queues");
@@ -128,9 +128,9 @@ async function createBatch(submissions) {
  */
 async function createProblemSubmission(body) {
   validate(body);
-  if (!isCpp(body.language_id)) {
+  if (!isSupported(body.language_id)) {
     throw new ValidationError(
-      { language_id: ["problem submissions are C++ only in this version"] },
+      { language_id: ["problem submissions are supported languages only in this version"] },
       422,
     );
   }

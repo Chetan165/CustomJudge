@@ -18,6 +18,45 @@ const log = createLogger("execute-worker");
 const TC_MOUNT = "/tc";
 const BIN_MOUNT = "/bin_ro";
 
+//54, 76, 105, 52, 53
+
+const LanguageCommands = {
+  62: function (binaryPath, limits) {
+    const heapMb = Math.max(
+      32,
+      Math.floor((limits.memory_limit ?? 128000) / 1024) - 32,
+    );
+    const command = [
+      `${config.compile.JavaExecutable}`,
+      "-Xss64m",
+      `-Xmx${heapMb}m`,
+      "-jar",
+      `${BIN_MOUNT}/${path.basename(binaryPath)}`,
+    ];
+    return command;
+  },
+  54: function (binaryPath, limits) {
+    const command = [`${BIN_MOUNT}/${path.basename(binaryPath)}`];
+    return command;
+  },
+  76: function (binaryPath, limits) {
+    const command = [`${BIN_MOUNT}/${path.basename(binaryPath)}`];
+    return command;
+  },
+  105: function (binaryPath, limits) {
+    const command = [`${BIN_MOUNT}/${path.basename(binaryPath)}`];
+    return command;
+  },
+  52: function (binaryPath, limits) {
+    const command = [`${BIN_MOUNT}/${path.basename(binaryPath)}`];
+    return command;
+  },
+  53: function (binaryPath, limits) {
+    const command = [`${BIN_MOUNT}/${path.basename(binaryPath)}`];
+    return command;
+  },
+};
+
 // Compile is a separate job here, so an execution run never needs the wall
 // budget that stock Judge0 reserves for compiling. Tighter = faster TLE.
 function executionWallLimit(row) {
@@ -83,7 +122,7 @@ async function processExecute(job) {
     // Fresh box every run; binary mounted read-only so no testcase can tamper
     // with it for subsequent runs.
     res = await sandbox.execute({
-      command: [`${BIN_MOUNT}/${path.basename(binaryPath)}`],
+      command: LanguageCommands[row.language_id](binaryPath, limits),
       limits,
       mounts: [
         { inside: TC_MOUNT, outside: stdin.mountDir, rw: false },
@@ -94,7 +133,9 @@ async function processExecute(job) {
   } finally {
     if (stdin.cleanup) {
       const fsp = require("fs").promises;
-      await fsp.rm(stdin.cleanup, { recursive: true, force: true }).catch(() => {});
+      await fsp
+        .rm(stdin.cleanup, { recursive: true, force: true })
+        .catch(() => {});
     }
   }
 
