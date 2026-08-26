@@ -47,7 +47,6 @@ router.post("/submissions", async (req, res) => {
 
 // POST /submissions/batch
 router.post("/submissions/batch", async (req, res) => {
-  console.log("Batch submission request body:", req.body);
   const list = req.body?.submissions;
   if (!Array.isArray(list) || !list.length) {
     return res
@@ -68,7 +67,6 @@ router.post("/submissions/batch", async (req, res) => {
     const b64 = isBase64(req);
     const decoded = list.map((s) => decodeSubmissionInput(s, b64));
     const results = await submissionService.createBatch(decoded);
-    console.log("Batch submission results:", results);
     return res.status(201).json(results);
   } catch (err) {
     return handleError(res, err);

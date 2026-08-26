@@ -54,7 +54,7 @@ async function processCompile(job) {
   const key = compileCacheKey(
     first.source_code,
     languageId,
-    config.compile.flags,
+    config.compile.flags || "",
   );
   await submissionRepo.setCompileKey(submissionGroup, key);
 

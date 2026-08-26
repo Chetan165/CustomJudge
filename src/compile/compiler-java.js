@@ -72,9 +72,10 @@ async function compile({ compileKey, sourceCode, languageId, limits }) {
     await ensureDir(path.dirname(dest));
 
     const command = [
-      "sh",
+      "/bin/sh",
       "-c",
-      `${config.compile.JavaCompiler} ${SOURCE_NAME} && jar cvfe ${ARTIFACT_NAME} Main *.class`,
+      `${config.compile.JavaCompiler} ${SOURCE_NAME} && ` +
+        `${config.compile.JavaJar} cvfe ${ARTIFACT_NAME} Main *.class`,
     ];
 
     const res = await sandbox.executeWithArtifact({

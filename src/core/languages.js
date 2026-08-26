@@ -16,7 +16,14 @@ const DEFAULT_LIMITS = {
 
 const LANGUAGE_LIMIT_OVERRIDES = {
   54: { cpu_time_limit: 2, wall_time_limit: 8 },
-  62: { cpu_time_limit: 3, wall_time_limit: 10 , memory_limit: 512000, stack_limit: 128000 , max_processes: 64, max_file_size: 131072 },
+  62: {
+    cpu_time_limit: 3,
+    wall_time_limit: 10,
+    memory_limit: 512000,
+    stack_limit: 128000,
+    max_processes: 64,
+    max_file_size: 131072,
+  },
 };
 
 function isSupported(languageId) {
@@ -30,11 +37,16 @@ function getLanguage(id) {
 function getLimits(languageId, overrides = {}) {
   const base = {
     ...DEFAULT_LIMITS,
-    ...(LANGUAGE_LIMIT_OVERRIDES[Number(languageId)] || {}),
   };
+
   for (const [k, v] of Object.entries(overrides)) {
-    if (v !== undefined && v !== null && v !== "") base[k] = v;
+    if (v !== undefined && v !== null && v !== "") {
+      base[k] = v;
+    }
   }
+
+  Object.assign(base, LANGUAGE_LIMIT_OVERRIDES[Number(languageId)] || {});
+
   return base;
 }
 
