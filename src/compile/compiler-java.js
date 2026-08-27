@@ -94,6 +94,11 @@ async function compile({ compileKey, sourceCode, languageId, limits }) {
           outside: config.compile.JavaHome,
           rw: false,
         },
+        {
+          inside: config.compile.JavaEtc,
+          outside: config.compile.JavaEtc,
+          rw: false,
+        },
       ],
       env: {
         JAVA_HOME: config.compile.JavaHome,

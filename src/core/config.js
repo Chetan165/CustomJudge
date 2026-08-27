@@ -70,6 +70,7 @@ const config = {
       `${process.env.JavaHome}/bin/java` ||
       "/usr/lib/jvm/java-11-openjdk-amd64/usr/bin/java",
     JavaFlags: process.env.JAVA_FLAGS || "-encoding=UTF-8",
+    JavaEtc: process.env.JavaEtc || "/etc/java-11-openjdk",
     JavaJar:
       `${process.env.JavaHome}/bin/jar` ||
       "/usr/lib/jvm/java-11-openjdk-amd64/bin/jar",
