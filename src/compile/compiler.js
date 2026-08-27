@@ -94,7 +94,10 @@ async function compile({ compileKey, sourceCode, languageId, limits }) {
       artifactDest: dest,
     });
 
-    const compileOutput = [res.stdout, res.stderr].filter(Boolean).join("\n").trim();
+    const compileOutput = [res.stdout, res.stderr]
+      .filter(Boolean)
+      .join("\n")
+      .trim();
     const success = res.exitCode === 0 && !!res.artifact;
 
     await binaryCache.record({

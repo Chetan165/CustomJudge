@@ -194,6 +194,8 @@ async function executeWithArtifact({
         // Java/JVM needs multiple threads.
         "--processes=64",
 
+        `--env=PATH=/usr/local/bin:/usr/bin:/bin`,
+
         // Existing sandbox environment.
         `--env=HOME=/box`,
 
