@@ -1,0 +1,27 @@
+============================================================
+SERVER MEMORY UTILIZATION BENCHMARK
+============================================================
+
+Benchmark:
+  Name:                judge0_cpp
+  Sampling Interval:   0.5 seconds
+
+Timing:
+  Start Timestamp:     1788678021220 ms
+  End Timestamp:       1788678060230 ms
+  Monitoring Duration:  39.010 seconds
+
+Memory:
+Baseline Used Memory: 1673.00 MB
+Peak Used Memory:     3208.00 MB
+Memory Increase:      1535.00 MB
+Minimum Available:    12235.00 MB
+Peak Timestamp:       1788678042626 ms
+
+Files:
+  Raw CSV:             results/judge0_cpp/judge0_cpp.csv
+  Summary:             results/judge0_cpp/judge0_cpp_summary.txt
+  Graph:               results/judge0_cpp/judge0_cpp.png
+  Report:              results/judge0_cpp/judge0_cpp_report.txt
+
+============================================================

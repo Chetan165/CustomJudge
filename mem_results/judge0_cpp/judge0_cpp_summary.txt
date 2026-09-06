@@ -1,0 +1,5 @@
+Baseline Used Memory: 1673.00 MB
+Peak Used Memory:     3208.00 MB
+Memory Increase:      1535.00 MB
+Minimum Available:    12235.00 MB
+Peak Timestamp:       1788678042626 ms
