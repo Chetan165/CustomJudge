@@ -190,10 +190,6 @@ CustomJudge is a robust code execution service designed to handle extreme concur
 
 **Memory Profile Analysis:**
 
-> **📊 Interactive Dashboard:** For a fully interactive memory profile with hover tooltips, zoom, and pan controls, open [`mem_results/memory-comparison.html`](mem_results/memory-comparison.html) locally in your browser. This file contains real-time visualizations from the benchmark data.
-
-**Static Memory Profiles** (if interactive dashboard is unavailable):
-
 ![CustomJudge Memory Utilization](mem_results/custom_judge_cpp/custom_judge_cpp.png)
 
 ![Judge0 Memory Utilization](mem_results/judge0_cpp/judge0_cpp.png)
@@ -201,12 +197,14 @@ CustomJudge is a robust code execution service designed to handle extreme concur
 **Key Observations from the Data:**
 
 **CustomJudge** exhibits a smooth, predictable memory curve:
+
 - Gradual climb during submission ingestion
 - Single peak at 1600 MB (2× baseline)
 - Smooth decline as jobs complete and compile cache is opportunistically shared
 - Low fragmentation and efficient GC
 
 **Judge0** shows high-variance, oscillatory behavior:
+
 - Rapid spikes to 3208 MB (1.9× CustomJudge's peak)
 - Repeated cycles of memory buildup and release (20+ spikes)
 - Double the baseline memory overhead (1673 MB vs 817 MB)
