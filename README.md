@@ -21,6 +21,8 @@ CustomJudge is a robust code execution service designed to handle extreme concur
 - Redis queue: Distributed job queue enables horizontal scaling via multiple worker nodes
 - Postgres persistence: Submission tracking, result storage, and compile cache metadata
 
+![System Architecture](./judge.png)
+
 ---
 
 ## Deployment Steps
